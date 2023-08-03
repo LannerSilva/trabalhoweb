@@ -1,0 +1,40 @@
+import requests
+from bs4 import BeautifulSoup
+
+def buscar_vagas_emprego(palavra_chave, localizacao):
+    url = f"https://www.indeed.com.br/empregos?q={palavra_chave}&l={localizacao}"
+
+    # Fazer a requisição para obter o HTML da página
+    response = requests.get(url)
+
+    # Verificar se a requisição foi bem-sucedida
+    if response.status_code == 200:
+        # Parsear o HTML usando BeautifulSoup
+        soup = BeautifulSoup(response.content, "html.parser")
+
+        # Encontrar os elementos que contêm as informações das vagas
+        vagas = soup.find_all("div", class_="jobsearch-SerpJobCard")
+
+        # Exibir as informações das vagas encontradas
+        for vaga in vagas:
+            titulo = vaga.find("a", class_="jobtitle").text.strip()
+            empresa = vaga.find("span", class_="company").text.strip()
+            local = vaga.find("span", class_="location").text.strip()
+            salario = vaga.find("span", class_="salaryText")
+            salario = salario.text.strip() if salario else "Não informado"
+
+            print(f"Vaga: {titulo}")
+            print(f"Empresa: {empresa}")
+            print(f"Local: {local}")
+            print(f"Salário: {salario}")
+            print("=" * 50)
+
+    else:
+        print("Não foi possível acessar as vagas de emprego.")
+
+# Exemplo de uso
+if __name__ == "__main__":
+    palavra_chave = input("Digite a palavra-chave da vaga de emprego: ")
+    localizacao = input("Digite a localização da vaga de emprego: ")
+
+    buscar_vagas_emprego(palavra_chave, localizacao)
